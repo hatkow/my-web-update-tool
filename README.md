@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ウェブサイト更新支援ツール
 
-## Getting Started
+顧客が簡単にウェブサイトを更新できる CMS（コンテンツ管理システム）です。
 
-First, run the development server:
+## 機能
+
+- 🔐 **認証システム**: Supabase Auth によるセキュアなログイン
+- 👥 **ユーザー管理**: 管理者によるユーザーの追加・削除
+- 📁 **プロジェクト管理**: FTP 設定の登録とユーザーへの割り当て
+- ✏️ **コンテンツ編集**: ブラウザ上で HTML ファイルを直接編集
+- 🔒 **FTP パスワード暗号化**: セキュアなパスワード保存
+
+## 技術スタック
+
+- **フロントエンド**: Next.js 14 (App Router) + TypeScript
+- **スタイリング**: Tailwind CSS
+- **認証・DB**: Supabase (Auth + PostgreSQL)
+- **FTP 接続**: basic-ftp
+- **デプロイ**: Vercel
+
+## セットアップ
+
+### 1. Supabase プロジェクトの作成
+
+1. [Supabase](https://supabase.com/)でプロジェクトを作成
+2. SQL Editor で `supabase/schema.sql` を実行
+
+### 2. 環境変数の設定
+
+`.env.local.example` をコピーして `.env.local` を作成:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.local.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+以下の値を設定:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
+ENCRYPTION_KEY=your-32-character-encryption-key
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. 初期管理者ユーザーの作成
 
-## Learn More
+1. Supabase Auth でユーザーを作成
+2. SQL Editor で以下を実行:
 
-To learn more about Next.js, take a look at the following resources:
+```sql
+SELECT create_admin_profile('ユーザーのUUID', 'メールアドレス');
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 4. 開発サーバーの起動
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm install
+npm run dev
+```
 
-## Deploy on Vercel
+`http://localhost:3000` にアクセス
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Vercel へのデプロイ
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 1. GitHub にプッシュ
+
+```bash
+git add .
+git commit -m "Initial commit"
+git push origin main
+```
+
+### 2. Vercel でプロジェクトをインポート
+
+1. [Vercel](https://vercel.com/)にログイン
+2. 「New Project」→ GitHub リポジトリを選択
+3. 環境変数を設定（Settings → Environment Variables）
+4. 「Deploy」をクリック
+
+### 3. 完了！
+
+デプロイ後、`https://your-project.vercel.app` でアクセス可能になります。
+
+## 使い方
+
+### 管理者
+
+1. `/admin/users` でユーザーを作成
+2. `/admin/projects` で FTP 設定を登録
+3. プロジェクトをユーザーに割り当て
+
+### 作業者
+
+1. ログイン
+2. ダッシュボードでプロジェクトを選択
+3. ファイルを編集
+4. 「サイトに反映」をクリック
+
+## ライセンス
+
+MIT
