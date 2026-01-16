@@ -63,8 +63,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, content })
   } catch (error: any) {
     console.error('Error reading FTP file:', error)
+    
+    let errorMessage = `ファイル読み込み失敗: ${error.message || '不明なエラー'}`
+    
+    // Add helpful hint for 550 errors with non-ASCII characters
+    if ((error.code === 550 || error.message?.includes('550')) && /[^\x00-\x7F]/.test(file_path || '')) {
+      errorMessage += ' (ヒント: 日本語のフォルダ名やファイル名が含まれているため、サーバーが認識できない可能性があります。フォルダ名を半角英数字に変更してみてください)'
+    }
+
     return NextResponse.json(
-      { error: `ファイル読み込み失敗: ${error.message || '不明なエラー'}` },
+      { error: errorMessage },
       { status: 500 }
     )
   }
