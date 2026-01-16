@@ -8,7 +8,15 @@ import { createClient } from '@/lib/supabase/client'
 import type { Project } from '@/lib/types'
 
 export default function ProjectEditPage() {
-  // ... existing state
+  const params = useParams()
+  const router = useRouter()
+  const [project, setProject] = useState<Project | null>(null)
+  const [content, setContent] = useState('')
+  const [initialContent, setInitialContent] = useState('')
+  const [selectedFile, setSelectedFile] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [hasChanges, setHasChanges] = useState(false)
   const [viewMode, setViewMode] = useState<'code' | 'preview' | 'split'>('split')
   const [editorMode, setEditorMode] = useState<'code' | 'visual'>('code')
   
@@ -17,7 +25,79 @@ export default function ProjectEditPage() {
   const [schedule, setSchedule] = useState<ScheduleItem[]>([])
   const [activeTab, setActiveTab] = useState<'events' | 'schedule'>('events')
 
-  // ... existing fetch logic
+  useEffect(() => {
+    fetchProject()
+  }, [])
+
+  useEffect(() => {
+    if (selectedFile && project) {
+      loadFile()
+    }
+  }, [selectedFile])
+
+  useEffect(() => {
+    setHasChanges(content !== initialContent)
+  }, [content, initialContent])
+
+  const fetchProject = async () => {
+    try {
+      setLoading(true)
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (!user) {
+        router.push('/login')
+        return
+      }
+
+      // Check if user has access
+      const { data: assignment } = await supabase
+        .from('user_projects')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('project_id', params.id as string)
+        .single()
+      
+      // Also allow admin
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      if (!assignment && profile?.role !== 'admin') {
+        alert('プロジェクトへのアクセス権がありません')
+        router.push('/dashboard')
+        return
+      }
+
+      const { data: projectData, error } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('id', params.id as string)
+        .single()
+
+      if (error || !projectData) {
+        console.error('Error fetching project:', error)
+        alert('プロジェクトの取得に失敗しました')
+        return
+      }
+
+      setProject(projectData)
+      
+      // Set default selected file if available
+      if (projectData.target_files && projectData.target_files.length > 0) {
+        // Find index.html or use first file
+        const defaultFile = projectData.target_files.find((f: string) => f === 'index.html') || projectData.target_files[0]
+        setSelectedFile(defaultFile)
+      }
+
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Parse content when switching to visual mode
   const handleSwitchToVisual = () => {
@@ -45,7 +125,69 @@ export default function ProjectEditPage() {
     setContent(newHtml)
   }
 
-  // ... existing loadFile and handleSave
+  const loadFile = async () => {
+    if (!selectedFile || !project) return
+    
+    try {
+      setLoading(true)
+      const response = await fetch('/api/ftp/read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          project_id: project.id,
+          file_path: selectedFile
+        })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'ファイルの読み込みに失敗しました')
+      }
+
+      setContent(data.content)
+      setInitialContent(data.content)
+      setEditorMode('code') // Reset to code mode on load
+      setViewMode('split')
+    } catch (e: any) {
+      console.error(e)
+      alert(e.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSave = async () => {
+    if (!selectedFile || !project) return
+
+    try {
+      setSaving(true)
+      const response = await fetch('/api/ftp/write', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          project_id: project.id,
+          file_path: selectedFile,
+          content: content
+        })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || '保存に失敗しました')
+      }
+
+      setInitialContent(content)
+      setHasChanges(false)
+      alert('保存しました')
+    } catch (e: any) {
+      console.error(e)
+      alert(e.message)
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
