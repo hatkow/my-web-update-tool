@@ -572,7 +572,6 @@ export default function ProjectEditPage() {
                                 className="flex-1 w-full h-full"
                                 srcDoc={(() => {
                                     let baseUrl = '';
-                                    let baseUrl = '';
                                     if (project?.public_url) {
                                         let url = project.public_url.trim();
                                         // Auto-prepend https if missing protocol
