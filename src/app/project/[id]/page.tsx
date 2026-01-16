@@ -576,6 +576,7 @@ export default function ProjectEditPage() {
                         
                         {/* Preview Area (Full height) */}
                          <div className="flex-1 bg-white flex flex-col">
+                              <div className="bg-slate-100 border-b border-slate-200 px-3 py-1 flex items-center justify-between text-xs text-slate-500">
                                  <div className="flex items-center gap-2">
                                     <span>Preview</span>
                                     {/* Warning Logic */}
