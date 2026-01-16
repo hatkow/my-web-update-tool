@@ -61,12 +61,6 @@ export async function POST(request: Request) {
       { error: 'プロジェクト作成中にエラーが発生しました' },
       { status: 500 }
     )
-  } catch (error) {
-    console.error('Error creating project:', error)
-    return NextResponse.json(
-      { error: 'プロジェクト作成中にエラーが発生しました' },
-      { status: 500 }
-    )
   }
 }
 
