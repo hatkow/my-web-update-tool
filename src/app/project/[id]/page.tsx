@@ -161,15 +161,24 @@ export default function ProjectEditPage() {
                               {/* Preview Iframe */}
                               <div className={`flex-1 bg-white flex flex-col ${viewMode === 'code' ? 'hidden' : ''}`}>
                                  <iframe
-                                    className="flex-1 w-full h-full"
-                                    srcDoc={content.replace('<head>', `<head><base href="http://${project?.ftp_host}${project?.ftp_path.endsWith('/') ? project?.ftp_path : project?.ftp_path + '/'}">`)}
-                                    sandbox="allow-scripts allow-same-origin"
-                                 />
-                              </div>
-                        </div>
-                    </>
-                ) : (
-                    // VISUAL EDITOR FLIP LAYOUT: Form on Left, Preview on Right
+                    title="Live Preview"
+                    className="flex-1 w-full h-full"
+                    srcDoc={(() => {
+                        // Inject <base> tag to fix relative paths
+                        // Use public_url if available, falling back to FTP host
+                        let baseUrl = '';
+                        if (project.public_url) {
+                            baseUrl = project.public_url.endsWith('/') ? project.public_url : project.public_url + '/';
+                        } else {
+                            baseUrl = `http://${project.ftp_host}${project.ftp_path.endsWith('/') ? project.ftp_path : project.ftp_path + '/'}`;
+                        }
+                        
+                        const baseTag = `<base href="${baseUrl}">`;
+                        // Insert after <head> or at start
+                        return content.replace('<head>', `<head>${baseTag}`);
+                    })()}
+                    sandbox="allow-scripts allow-same-origin" 
+                 />   {/* VISUAL EDITOR FLIP LAYOUT: Form on Left, Preview on Right */}
                      <div className="flex-1 flex overflow-hidden">
                         {/* Form Area */}
                         <div className="w-[500px] flex flex-col border-r border-white/10 bg-slate-800 overflow-hidden">
