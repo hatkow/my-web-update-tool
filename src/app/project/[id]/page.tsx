@@ -4,6 +4,7 @@ import { parseEvents, parseSchedule, generateEventsHtml, generateScheduleHtml, t
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import type { Project } from '@/lib/types'
 
