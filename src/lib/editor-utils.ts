@@ -34,7 +34,10 @@ export function parseEvents(html: string): EventItem[] {
   // Strategy: Split by <div class="event-in">
   // NOTE: This relies on the specific formatting provided by the user.
   
-  const eventRegex = /<div class="event-in">\s*<h3>(.*?)<\/h3>\s*<div class="event-in-flex">\s*<div>(.*?)<\/div>\s*<div class="event_btns">(.*?)<\/div>\s*<\/div>\s*<\/div>/gs
+  // Strategy: Split by <div class="event-in">
+  // NOTE: This relies on the specific formatting provided by the user.
+  
+  const eventRegex = new RegExp('<div class="event-in">\\s*<h3>(.*?)<\\/h3>\\s*<div class="event-in-flex">\\s*<div>(.*?)<\\/div>\\s*<div class="event_btns">(.*?)<\\/div>\\s*<\\/div>\\s*<\\/div>', 'gs')
   
   // We'll use a safer approach: DOMParser if window is defined (browser), else simple regex fallback?
   // Since this is for the Editor (Client Component), we can assume browser environment or pass it to a parsing function.
@@ -46,7 +49,7 @@ export function parseEvents(html: string): EventItem[] {
   // "新春にしきの亭" structure.
   
   // Regex to match the standard event structure
-  const blockRegex = /<div class="event-in">\s*<h3>(.*?)<\/h3>\s*<div class="event-in-flex">\s*<div>\s*(.*?)\s*<\/div>\s*<div class="event_btns">\s*(.*?)\s*<\/div>\s*<\/div>\s*<\/div>/gs
+  const blockRegex = new RegExp('<div class="event-in">\\s*<h3>(.*?)<\\/h3>\\s*<div class="event-in-flex">\\s*<div>\\s*(.*?)\\s*<\\/div>\\s*<div class="event_btns">\\s*(.*?)\\s*<\\/div>\\s*<\\/div>\\s*<\\/div>', 'gs')
   
   let match
   while ((match = blockRegex.exec(html)) !== null) {
@@ -140,7 +143,7 @@ export function parseSchedule(html: string): ScheduleItem[] {
   //     <p class="close">終了しました</p>
   // </div>
   
-  const blockRegex = /<div class="year-event-text">\s*<h5>(.*?)<\/h5>\s*<p>(.*?)<\/p>(\s*<p class="close">終了しました<\/p>)?\s*<\/div>/gs
+  const blockRegex = new RegExp('<div class="year-event-text">\\s*<h5>(.*?)<\\/h5>\\s*<p>(.*?)<\\/p>(\\s*<p class="close">終了しました<\\/p>)?\\s*<\\/div>', 'gs')
   
   let match
   while ((match = blockRegex.exec(html)) !== null) {
