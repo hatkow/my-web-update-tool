@@ -22,6 +22,7 @@ export default function ProjectsPage() {
   const [ftpPassword, setFtpPassword] = useState('')
   const [ftpPort, setFtpPort] = useState('21')
   const [ftpPath, setFtpPath] = useState('/')
+  const [publicUrl, setPublicUrl] = useState('')
   const [targetFiles, setTargetFiles] = useState('')
   
   const [saving, setSaving] = useState(false)
@@ -86,6 +87,7 @@ export default function ProjectsPage() {
       ftp_user: ftpUser,
       ftp_port: parseInt(ftpPort),
       ftp_path: ftpPath,
+      public_url: publicUrl,
       target_files: targetFiles.split('\n').filter(f => f.trim()),
     }
 
@@ -129,6 +131,7 @@ export default function ProjectsPage() {
     setFtpPassword('')
     setFtpPort('21')
     setFtpPath('/')
+    setPublicUrl('')
     setTargetFiles('')
     setEditingProject(null)
   }
@@ -146,6 +149,7 @@ export default function ProjectsPage() {
     setFtpPassword('') // Password is not filled for security
     setFtpPort(project.ftp_port.toString())
     setFtpPath(project.ftp_path || '/')
+    setPublicUrl(project.public_url || '')
     setTargetFiles(project.target_files ? project.target_files.join('\n') : '')
     setShowModal(true)
   }

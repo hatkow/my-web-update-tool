@@ -394,8 +394,18 @@ export default function ProjectEditPage() {
                                 <span>Preview</span>
                              </div>
                              <iframe
+                                title="Live Preview"
                                 className="flex-1 w-full h-full"
-                                srcDoc={content.replace('<head>', `<head><base href="http://${project?.ftp_host}${project?.ftp_path.endsWith('/') ? project?.ftp_path : project?.ftp_path + '/'}">`)}
+                                srcDoc={(() => {
+                                    let baseUrl = '';
+                                    if (project?.public_url) {
+                                        baseUrl = project.public_url.endsWith('/') ? project.public_url : project.public_url + '/';
+                                    } else {
+                                        baseUrl = `http://${project?.ftp_host}${project?.ftp_path.endsWith('/') ? project?.ftp_path : project?.ftp_path + '/'}`;
+                                    }
+                                    const baseTag = `<base href="${baseUrl}">`;
+                                    return content.replace('<head>', `<head>${baseTag}`);
+                                })()}
                                 sandbox="allow-scripts allow-same-origin"
                              />
                           </div>
