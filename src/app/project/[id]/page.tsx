@@ -190,6 +190,35 @@ export default function ProjectEditPage() {
     }
   }
 
+  const renderUrlWarning = () => {
+    if (!project?.public_url) {
+      return (
+        <span className="text-red-400 flex items-center gap-1 font-bold">
+          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+          公開URL未設定 (CSS無効)
+        </span>
+      )
+    }
+    
+    // Check for http (Mixed content risk)
+    // Also check if likely http (no protocol)
+    const isHttp = project.public_url.startsWith('http://')
+    const noProtocol = project.public_url.indexOf('://') === -1 && !project.public_url.startsWith('https')
+    
+    if (isHttp || noProtocol) {
+       // If usage is likely http, warn
+       if (project.public_url.startsWith('http://')) {
+         return (
+            <span className="text-amber-500 flex items-center gap-1 text-[10px]">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                保護されていない通信(http)のため、CSSがブロックされる可能性があります
+            </span>
+         )
+       }
+    }
+    return null
+  }
+
   if (loading || !project) {
     return <div className="min-h-screen bg-slate-900 flex items-center justify-center text-white">Loading...</div>
   }
@@ -549,22 +578,8 @@ export default function ProjectEditPage() {
                          <div className="flex-1 bg-white flex flex-col">
                                  <div className="flex items-center gap-2">
                                     <span>Preview</span>
-                                    {!project?.public_url ? (
-                                        <span className="text-red-400 flex items-center gap-1 font-bold">
-                                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                                            公開URL未設定 (CSS無効)
-                                        </span>
-                                    ) : (project.public_url.startsWith('http://') || (project.public_url.indexOf('://') === -1 && !project.public_url.startsWith('https'))) ? (
-                                         // Warning for HTTP or potentially ambiguous URLs (though we force HTTPS in logic below, showing warning if input is raw HTTP)
-                                         // Actually, let's check the *processed* URL or just the input. 
-                                         // If input is explicitly http, warn.
-                                        project.public_url.startsWith('http://') && (
-                                            <span className="text-amber-500 flex items-center gap-1 text-[10px]">
-                                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                保護されていない通信(http)のため、CSSがブロックされる可能性があります
-                                            </span>
-                                        )
-                                    ) : null}
+                                    {/* Warning Logic */}
+                                    {renderUrlWarning()}
                                  </div>
                               </div>
                              <iframe
