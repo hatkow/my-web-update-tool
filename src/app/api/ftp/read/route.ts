@@ -61,10 +61,10 @@ export async function POST(request: Request) {
     }, file_path)
 
     return NextResponse.json({ success: true, content })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error reading FTP file:', error)
     return NextResponse.json(
-      { error: 'ファイル読み込み中にエラーが発生しました' },
+      { error: `ファイル読み込み失敗: ${error.message || '不明なエラー'}` },
       { status: 500 }
     )
   }
