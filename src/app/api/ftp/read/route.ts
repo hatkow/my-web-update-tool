@@ -4,8 +4,11 @@ import { readFile } from '@/lib/ftp'
 import type { Project } from '@/lib/types'
 
 export async function POST(request: Request) {
+  let requestFilePath = ''
+
   try {
     const { project_id, file_path } = await request.json()
+    requestFilePath = file_path || ''
 
     if (!project_id || !file_path) {
       return NextResponse.json(
@@ -67,7 +70,7 @@ export async function POST(request: Request) {
     let errorMessage = `ファイル読み込み失敗: ${error.message || '不明なエラー'}`
     
     // Add helpful hint for 550 errors with non-ASCII characters
-    if ((error.code === 550 || error.message?.includes('550')) && /[^\x00-\x7F]/.test(file_path || '')) {
+    if ((error.code === 550 || error.message?.includes('550')) && /[^\x00-\x7F]/.test(requestFilePath)) {
       errorMessage += ' (ヒント: 日本語のフォルダ名やファイル名が含まれているため、サーバーが認識できない可能性があります。フォルダ名を半角英数字に変更してみてください)'
     }
 
