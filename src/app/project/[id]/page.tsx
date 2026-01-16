@@ -1,6 +1,9 @@
 import { parseEvents, parseSchedule, generateEventsHtml, generateScheduleHtml, type EventItem, type ScheduleItem } from '@/lib/editor-utils'
 
-// ... existing imports
+import { useState, useEffect } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import type { Project } from '@/lib/types'
 
 export default function ProjectEditPage() {
   // ... existing state
