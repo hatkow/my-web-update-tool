@@ -178,7 +178,12 @@ export default function ProjectEditPage() {
                         return content.replace('<head>', `<head>${baseTag}`);
                     })()}
                     sandbox="allow-scripts allow-same-origin" 
-                 />   {/* VISUAL EDITOR FLIP LAYOUT: Form on Left, Preview on Right */}
+                 />
+                              </div>
+                        </div>
+                    </>
+                ) : (
+                    // VISUAL EDITOR FLIP LAYOUT: Form on Left, Preview on Right
                      <div className="flex-1 flex overflow-hidden">
                         {/* Form Area */}
                         <div className="w-[500px] flex flex-col border-r border-white/10 bg-slate-800 overflow-hidden">
