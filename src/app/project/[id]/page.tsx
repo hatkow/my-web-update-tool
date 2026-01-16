@@ -1,3 +1,5 @@
+'use client'
+
 import { parseEvents, parseSchedule, generateEventsHtml, generateScheduleHtml, type EventItem, type ScheduleItem } from '@/lib/editor-utils'
 
 import { useState, useEffect } from 'react'

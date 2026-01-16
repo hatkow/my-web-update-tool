@@ -1,0 +1,12 @@
+'use client'
+
+import { parseEvents, parseSchedule, generateEventsHtml, generateScheduleHtml, type EventItem, type ScheduleItem } from '@/lib/editor-utils'
+
+import { useState, useEffect } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import type { Project } from '@/lib/types'
+
+export default function ProjectEditPage() {
+  // ... existing state
+  const [viewMode, setViewMode] = useState<'code' | 'preview' | 'split'>('split')
