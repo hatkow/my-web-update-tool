@@ -190,6 +190,10 @@ export default function ProjectEditPage() {
     }
   }
 
+  if (loading || !project) {
+    return <div className="min-h-screen bg-slate-900 flex items-center justify-center text-white">Loading...</div>
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
