@@ -70,32 +70,47 @@ export default function ProjectsPage() {
     }
   }
 
+  const [editingProject, setEditingProject] = useState<Project | null>(null)
+
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
     setError('')
 
+    const isEditing = !!editingProject
+    const url = '/api/admin/projects'
+    const method = isEditing ? 'PUT' : 'POST'
+    const body: any = {
+      name,
+      ftp_host: ftpHost,
+      ftp_user: ftpUser,
+      ftp_port: parseInt(ftpPort),
+      ftp_path: ftpPath,
+      target_files: targetFiles.split('\n').filter(f => f.trim()),
+    }
+
+    if (isEditing) {
+      body.id = editingProject.id
+      if (ftpPassword) {
+        body.ftp_password = ftpPassword
+      }
+    } else {
+      body.ftp_password = ftpPassword
+    }
+
     try {
-      const response = await fetch('/api/admin/projects', {
-        method: 'POST',
+      const response = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          ftp_host: ftpHost,
-          ftp_user: ftpUser,
-          ftp_password: ftpPassword,
-          ftp_port: parseInt(ftpPort),
-          ftp_path: ftpPath,
-          target_files: targetFiles.split('\n').filter(f => f.trim()),
-        }),
+        body: JSON.stringify(body),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.error || 'プロジェクト作成に失敗しました')
+        setError(data.error || `プロジェクト${isEditing ? '更新' : '作成'}に失敗しました`)
       } else {
-        setSuccess('プロジェクトを作成しました')
+        setSuccess(`プロジェクトを${isEditing ? '更新' : '作成'}しました`)
         resetForm()
         setShowModal(false)
         fetchProjects()
@@ -115,6 +130,24 @@ export default function ProjectsPage() {
     setFtpPort('21')
     setFtpPath('/')
     setTargetFiles('')
+    setEditingProject(null)
+  }
+
+  const handleOpenCreateModal = () => {
+    resetForm()
+    setShowModal(true)
+  }
+
+  const handleOpenEditModal = (project: Project) => {
+    setEditingProject(project)
+    setName(project.name)
+    setFtpHost(project.ftp_host)
+    setFtpUser(project.ftp_user)
+    setFtpPassword('') // Password is not filled for security
+    setFtpPort(project.ftp_port.toString())
+    setFtpPath(project.ftp_path || '/')
+    setTargetFiles(project.target_files ? project.target_files.join('\n') : '')
+    setShowModal(true)
   }
 
   const handleDeleteProject = async (projectId: string) => {
@@ -191,7 +224,7 @@ export default function ProjectsPage() {
           </p>
         </div>
         <button
-          onClick={() => setShowModal(true)}
+          onClick={handleOpenCreateModal}
           className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all flex items-center gap-2"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -239,6 +272,15 @@ export default function ProjectsPage() {
                     </svg>
                   </Link>
                   <button
+                    onClick={() => handleOpenEditModal(project)}
+                    className="p-2 text-slate-400 hover:text-yellow-400 transition-colors"
+                    title="編集"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button
                     onClick={() => handleOpenAssignModal(project)}
                     className="p-2 text-slate-400 hover:text-blue-400 transition-colors"
                     title="ユーザー割り当て"
@@ -273,12 +315,12 @@ export default function ProjectsPage() {
         )}
       </div>
 
-      {/* Create Modal */}
+      {/* Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-slate-800 border border-white/10 rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold text-white mb-4">
-              新規プロジェクト作成
+              {editingProject ? 'プロジェクト編集' : '新規プロジェクト作成'}
             </h2>
             <form onSubmit={handleCreateProject} className="space-y-4">
               <div>
@@ -338,14 +380,14 @@ export default function ProjectsPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">
-                    FTPパスワード
+                    FTPパスワード {editingProject && '(変更しない場合は空欄)'}
                   </label>
                   <input
                     type="password"
                     value={ftpPassword}
                     onChange={(e) => setFtpPassword(e.target.value)}
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
+                    required={!editingProject}
                   />
                 </div>
               </div>
@@ -378,7 +420,7 @@ export default function ProjectsPage() {
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
-                  onClick={() => { setShowModal(false); resetForm() }}
+                  onClick={() => { setShowModal(false); resetForm(); }}
                   className="flex-1 px-4 py-3 bg-white/5 text-slate-300 font-medium rounded-lg hover:bg-white/10 transition-colors"
                 >
                   キャンセル
@@ -388,7 +430,7 @@ export default function ProjectsPage() {
                   disabled={saving}
                   className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 transition-all"
                 >
-                  {saving ? '作成中...' : '作成'}
+                  {saving ? (editingProject ? '更新中...' : '作成中...') : (editingProject ? '更新' : '作成')}
                 </button>
               </div>
             </form>
