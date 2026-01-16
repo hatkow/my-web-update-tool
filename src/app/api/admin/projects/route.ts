@@ -5,7 +5,7 @@ import { encrypt } from '@/lib/encryption'
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, ftp_host, ftp_user, ftp_password, ftp_port, ftp_path, target_files } = body
+    const { name, ftp_host, ftp_user, ftp_password, ftp_port, ftp_path, public_url, target_files } = body
 
     if (!name || !ftp_host || !ftp_user || !ftp_password) {
       return NextResponse.json(
@@ -45,6 +45,7 @@ export async function POST(request: Request) {
         ftp_password_encrypted: encryptedPassword,
         ftp_port: ftp_port || 21,
         ftp_path: ftp_path || '/',
+        public_url: public_url || null,
         target_files: target_files || [],
       })
       .select()
@@ -67,7 +68,7 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   try {
     const body = await request.json()
-    const { id, name, ftp_host, ftp_user, ftp_password, ftp_port, ftp_path, target_files } = body
+    const { id, name, ftp_host, ftp_user, ftp_password, ftp_port, ftp_path, public_url, target_files } = body
 
     if (!id || !name || !ftp_host || !ftp_user) {
       return NextResponse.json(
@@ -101,6 +102,7 @@ export async function PUT(request: Request) {
       ftp_user,
       ftp_port: ftp_port || 21,
       ftp_path: ftp_path || '/',
+      public_url: public_url || null,
       target_files: target_files || [],
     }
 

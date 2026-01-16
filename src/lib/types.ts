@@ -13,6 +13,7 @@ export interface Project {
   ftp_password_encrypted: string
   ftp_port: number
   ftp_path: string
+  public_url?: string
   target_files: string[]
   created_at: string
 }
