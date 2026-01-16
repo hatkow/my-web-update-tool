@@ -49,7 +49,11 @@ export default function UsersPage() {
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.error || 'ユーザー作成に失敗しました')
+        if (data.debug) {
+           setError(`${data.error} (Debug: List=${data.debug.usersFoundInList}, Target=${data.debug.searchTarget})`)
+        } else {
+           setError(data.error || 'ユーザー作成に失敗しました')
+        }
       } else {
         setSuccess('ユーザーを作成しました')
         setEmail('')
@@ -89,7 +93,7 @@ export default function UsersPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">
-            ユーザー管理
+            ユーザー管理 (v2)
           </h1>
           <p className="text-slate-400">
             システムユーザーの追加・削除

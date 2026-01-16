@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Project, Profile, UserProject } from '@/lib/types'
 
+import Link from 'next/link'
+
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [users, setUsers] = useState<Profile[]>([])
@@ -227,6 +229,15 @@ export default function ProjectsPage() {
                   </svg>
                 </div>
                 <div className="flex gap-2">
+                  <Link
+                    href={`/project/${project.id}`}
+                    className="p-2 text-slate-400 hover:text-green-400 transition-colors"
+                    title="エディタを開く"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </Link>
                   <button
                     onClick={() => handleOpenAssignModal(project)}
                     className="p-2 text-slate-400 hover:text-blue-400 transition-colors"
@@ -419,7 +430,9 @@ export default function ProjectsPage() {
             
             <div className="space-y-4 mb-6">
               <h3 className="text-sm font-semibold text-slate-300">未割り当てユーザー</h3>
-              {users.filter(u => !assignedUserIds.includes(u.id)).length === 0 ? (
+              {users.length === 0 ? (
+                <p className="text-slate-500 text-sm">ユーザーがいません。「ユーザー管理」から追加してください。</p>
+              ) : users.filter(u => !assignedUserIds.includes(u.id)).length === 0 ? (
                 <p className="text-slate-500 text-sm">すべてのユーザーが割り当て済みです</p>
               ) : (
                 <div className="space-y-2">
