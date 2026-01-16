@@ -22,16 +22,28 @@ export default async function DashboardPage() {
     .eq('id', user.id)
     .single() as { data: Profile | null }
 
-  // Get assigned projects
-  const { data: userProjects } = await supabase
+  // Get assigned project IDs
+  const { data: assignments } = await supabase
     .from('user_projects')
-    .select(`
-      *,
-      project:projects(*)
-    `)
-    .eq('user_id', user.id) as { data: (UserProject & { project: Project })[] | null }
+    .select('project_id')
+    .eq('user_id', user.id)
 
-  const projects = userProjects?.map(up => up.project).filter(Boolean) || []
+  const projectIds = assignments?.map(a => a.project_id) || []
+
+  // Get project details
+  let projects: Project[] = []
+  
+  if (projectIds.length > 0) {
+    const { data } = await supabase
+      .from('projects')
+      .select('*')
+      .in('id', projectIds)
+      .order('created_at', { ascending: false })
+    
+    if (data) {
+      projects = data
+    }
+  }
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
