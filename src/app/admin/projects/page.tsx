@@ -408,6 +408,20 @@ export default function ProjectsPage() {
                   placeholder="/public_html"
                 />
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  公開WebサイトURL (任意)
+                </label>
+                <input
+                  type="text"
+                  value={publicUrl}
+                  onChange={(e) => setPublicUrl(e.target.value)}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="https://example.com"
+                />
+                <p className="text-xs text-slate-500 mt-1">プレビュー表示に使用します。未入力の場合はFTPホストを使用します。</p>
+              </div>
               
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">
