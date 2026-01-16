@@ -221,7 +221,7 @@ export default function ProjectsPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">
-            プロジェクト管理 (v1.1)
+            プロジェクト管理 (v1.2)
           </h1>
           <p className="text-slate-400">
             FTP設定の追加・ユーザーへの割り当て
