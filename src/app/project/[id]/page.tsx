@@ -582,6 +582,19 @@ export default function ProjectEditPage() {
                                     {/* Warning Logic */}
                                     {renderUrlWarning()}
                                  </div>
+                                 {/* Debug Info */}
+                                 <div className="text-[10px] text-slate-400 font-mono">
+                                    Base: {(() => {
+                                        if (project?.public_url) {
+                                            let url = project.public_url.trim()
+                                            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                                                url = 'https://' + url
+                                            }
+                                            return url.endsWith('/') ? url : url + '/'
+                                        }
+                                        return `http://${project?.ftp_host}${project?.ftp_path.endsWith('/') ? project?.ftp_path : project?.ftp_path + '/'}`
+                                    })()}
+                                 </div>
                               </div>
                              <iframe
                                 title="Live Preview"
