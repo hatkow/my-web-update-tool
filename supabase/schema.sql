@@ -21,6 +21,7 @@ CREATE TABLE projects (
   ftp_password_encrypted TEXT NOT NULL,
   ftp_port INTEGER DEFAULT 21,
   ftp_path TEXT DEFAULT '/',
+  public_url TEXT, -- Added v1.4
   target_files TEXT[] DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
