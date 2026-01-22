@@ -1,8 +1,17 @@
 import { createBrowserClient } from '@supabase/ssr'
 
 export function createClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
+  const getVal = (v: string | undefined) => {
+    if (!v) return undefined
+    const trimmed = v.trim()
+    if (trimmed.includes('=') && (trimmed.startsWith('NEXT_PUBLIC_') || trimmed.startsWith('SUPABASE_') || trimmed.startsWith('ENCRYPTION_'))) {
+      return trimmed.split('=')[1].trim()
+    }
+    return trimmed
+  }
+
+  const supabaseUrl = getVal(process.env.NEXT_PUBLIC_SUPABASE_URL)
+  const supabaseAnonKey = getVal(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
 
   if (!supabaseUrl || !supabaseAnonKey || !supabaseUrl.startsWith('http')) {
     console.warn('Supabase environment variables debug info:', {
