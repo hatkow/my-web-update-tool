@@ -5,7 +5,13 @@ export function createClient() {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseAnonKey || !supabaseUrl.startsWith('http')) {
-    console.warn('Missing or invalid Supabase environment variables')
+    console.warn('Supabase environment variables debug info:', {
+      hasUrl: !!supabaseUrl,
+      urlLength: supabaseUrl?.length || 0,
+      hasAnonKey: !!supabaseAnonKey,
+      anonKeyLength: supabaseAnonKey?.length || 0,
+      urlFormatOk: supabaseUrl?.startsWith('http') || false
+    })
     // Return a dummy client with VALID FORMAT values to prevent library from throwing
     return createBrowserClient('https://placeholder.supabase.co', 'placeholder-key')
   }
